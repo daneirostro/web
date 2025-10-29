@@ -461,8 +461,185 @@
             });
         });
     </script>
+    <!-- Chat Section (agregar antes del footer) -->
+<section id="chat" style="position: fixed; bottom: 20px; right: 20px; z-index: 999;">
+    <button id="chatButton" onclick="toggleChat()" style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #0077b6, #023e8a); border: none; color: white; font-size: 24px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: transform 0.3s;">
+        💬
+    </button>
+    
+    <div id="chatWindow" style="display: none; position: absolute; bottom: 80px; right: 0; width: 350px; height: 500px; background: white; border-radius: 15px; box-shadow: 0 8px 30px rgba(0,0,0,0.3); overflow: hidden; display: flex; flex-direction: column;">
+        <!-- Header -->
+        <div style="background: linear-gradient(135deg, #0077b6, #023e8a); color: white; padding: 1rem; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h3 style="margin: 0; font-size: 1.1rem;">🦷 Asistente Virtual</h3>
+                <p style="margin: 0; font-size: 0.85rem; opacity: 0.9;">Pregúntame lo que necesites</p>
+            </div>
+            <button onclick="toggleChat()" style="background: transparent; border: none; color: white; font-size: 1.5rem; cursor: pointer;">×</button>
+        </div>
+        
+        <!-- Messages -->
+        <div id="chatMessages" style="flex: 1; overflow-y: auto; padding: 1rem; background: #f5f5f5;">
+            <div class="message bot-message" style="margin-bottom: 1rem;">
+                <div style="background: white; padding: 0.8rem; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); max-width: 85%;">
+                    <p style="margin: 0; font-size: 0.9rem;">¡Hola! 👋 Soy tu asistente virtual. Puedo ayudarte con información sobre:</p>
+                    <ul style="margin: 0.5rem 0 0 0; font-size: 0.85rem; padding-left: 1.2rem;">
+                        <li>Horarios</li>
+                        <li>Precios</li>
+                        <li>Ubicación</li>
+                        <li>Especialidades</li>
+                        <li>Primera cita</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Input -->
+        <div style="padding: 1rem; background: white; border-top: 1px solid #ddd;">
+            <div style="display: flex; gap: 0.5rem;">
+                <input type="text" id="chatInput" placeholder="Escribe tu pregunta..." style="flex: 1; padding: 0.8rem; border: 2px solid #ddd; border-radius: 25px; font-size: 0.9rem; outline: none;" onkeypress="if(event.key==='Enter') sendMessage()">
+                <button onclick="sendMessage()" style="background: linear-gradient(135deg, #0077b6, #023e8a); color: white; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; transition: transform 0.2s;">➤</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    // URL de tu Google Sheet publicado como CSV
+    const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/TU_ID_AQUI/pub?output=csv';
+    
+    let chatData = [];
+    
+    // Cargar datos del Sheet al iniciar
+    async function loadChatData() {
+        try {
+            const response = await fetch(SHEET_URL);
+            const text = await response.text();
+            const lines = text.split('\n').slice(1); // Saltar encabezado
+            
+            chatData = lines.map(line => {
+                const [pregunta, respuesta] = line.split(',');
+                return {
+                    pregunta: pregunta ? pregunta.trim().toLowerCase() : '',
+                    respuesta: respuesta ? respuesta.trim() : ''
+                };
+            }).filter(item => item.pregunta && item.respuesta);
+            
+            console.log('Datos cargados:', chatData.length, 'respuestas');
+        } catch (error) {
+            console.error('Error cargando datos:', error);
+        }
+    }
+    
+    // Cargar datos al inicio
+    loadChatData();
+    
+    function toggleChat() {
+        const chatWindow = document.getElementById('chatWindow');
+        const chatButton = document.getElementById('chatButton');
+        
+        if (chatWindow.style.display === 'none' || !chatWindow.style.display) {
+            chatWindow.style.display = 'flex';
+            chatButton.style.transform = 'scale(0.9)';
+        } else {
+            chatWindow.style.display = 'none';
+            chatButton.style.transform = 'scale(1)';
+        }
+    }
+    
+    function sendMessage() {
+        const input = document.getElementById('chatInput');
+        const message = input.value.trim();
+        
+        if (!message) return;
+        
+        // Agregar mensaje del usuario
+        addMessage(message, 'user');
+        input.value = '';
+        
+        // Buscar respuesta
+        setTimeout(() => {
+            const response = findAnswer(message);
+            addMessage(response, 'bot');
+        }, 500);
+    }
+    
+    function findAnswer(userMessage) {
+        const messageLower = userMessage.toLowerCase();
+        
+        // Buscar coincidencia exacta o parcial
+        for (let item of chatData) {
+            if (messageLower.includes(item.pregunta) || item.pregunta.includes(messageLower)) {
+                return item.respuesta;
+            }
+        }
+        
+        // Si no encuentra respuesta
+        return 'Lo siento, no tengo información sobre eso. 😅 Por favor contacta directamente al consultorio al +51 999 999 999 o agenda tu cita arriba. ☝️';
+    }
+    
+    function addMessage(text, sender) {
+        const messagesDiv = document.getElementById('chatMessages');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'message ' + sender + '-message';
+        messageDiv.style.marginBottom = '1rem';
+        messageDiv.style.display = 'flex';
+        messageDiv.style.justifyContent = sender === 'user' ? 'flex-end' : 'flex-start';
+        
+        const bubble = document.createElement('div');
+        bubble.style.padding = '0.8rem';
+        bubble.style.borderRadius = '12px';
+        bubble.style.maxWidth = '85%';
+        bubble.style.fontSize = '0.9rem';
+        bubble.style.lineHeight = '1.4';
+        
+        if (sender === 'user') {
+            bubble.style.background = 'linear-gradient(135deg, #0077b6, #023e8a)';
+            bubble.style.color = 'white';
+        } else {
+            bubble.style.background = 'white';
+            bubble.style.color = '#333';
+            bubble.style.boxShadow = '0 2px 5px rgba(0,0,0,0.1)';
+        }
+        
+        bubble.textContent = text;
+        messageDiv.appendChild(bubble);
+        messagesDiv.appendChild(messageDiv);
+        
+        // Scroll al final
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+</script>
+
+<style>
+    /* Scroll personalizado para el chat */
+    #chatMessages::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    #chatMessages::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+    
+    #chatMessages::-webkit-scrollbar-thumb {
+        background: #0077b6;
+        border-radius: 3px;
+    }
+    
+    #chatButton:hover {
+        transform: scale(1.1) !important;
+    }
+    
+    @media (max-width: 768px) {
+        #chatWindow {
+            width: calc(100vw - 40px) !important;
+            right: 20px !important;
+            left: 20px !important;
+        }
+    }
+</style>
 </body>
 
 </html>
+
 
 
