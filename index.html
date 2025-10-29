@@ -461,7 +461,7 @@
             });
         });
     </script>
-   <!-- Chat Section (agregar antes del footer) -->
+  <!-- Chat Section -->
 <section id="chat" style="position: fixed; bottom: 20px; right: 20px; z-index: 999;">
     <button id="chatButton" onclick="toggleChat()" style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #0077b6, #023e8a); border: none; color: white; font-size: 24px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: transform 0.3s;">
         💬
@@ -489,6 +489,7 @@
                         <li>Especialidades</li>
                         <li>Primera cita</li>
                     </ul>
+                    <p style="margin: 0.5rem 0 0 0; font-size: 0.85rem; color: #0077b6;">💡 También puedo agendar una cita para ti</p>
                 </div>
             </div>
         </div>
@@ -504,32 +505,31 @@
 </section>
 
 <script>
-    // URL CORREGIDA - Debe terminar en /pub?output=csv
-    const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTyxqB8h_VqZQxEhxMO2q9gCqQ5pBKxYj6DZvKLQxOqYqYqxqB8h_VqZQxEhxMO2q9gCqQ5pBKxYj6DZvKLQ/pub?output=csv';
-    
-    // ESTA ES LA URL CORRECTA PARA TU SHEET:
-    // Necesitas publicarla correctamente. Sigue estos pasos:
+    // CONFIGURACIÓN
+    const SHEET_URL = 'https://docs.google.com/spreadsheets/d/13pyWNegS18VXoXCnZEhIcNtSgSjcAgPYLE3dyiYKTy8/gviz/tq?tqx=out:csv';
+    const APPS_SCRIPT_URL = 'TU_URL_DE_APPS_SCRIPT_AQUI'; // Reemplazar con tu URL
     
     let chatData = [];
     let chatLoaded = false;
+    let conversationState = 'normal'; // normal, collecting_name, collecting_phone, collecting_email, collecting_query
+    let userData = {
+        nombre: '',
+        telefono: '',
+        email: '',
+        consulta: ''
+    };
     
-    // Cargar datos del Sheet al iniciar
+    // Cargar datos del Sheet
     async function loadChatData() {
         try {
-            // URL temporal con tu ID correcto
-            const url = 'https://docs.google.com/spreadsheets/d/13pyWNegS18VXoXCnZEhIcNtSgSjcAgPYLE3dyiYKTy8/gviz/tq?tqx=out:csv';
-            
+            const url = SHEET_URL;
             const response = await fetch(url);
             const text = await response.text();
-            
-            // Parsear CSV
-            const lines = text.split('\n').slice(1); // Saltar encabezado
+            const lines = text.split('\n').slice(1);
             
             chatData = [];
             lines.forEach(line => {
                 if (!line.trim()) return;
-                
-                // Limpiar comillas del CSV
                 const cleanLine = line.replace(/"/g, '');
                 const parts = cleanLine.split(',');
                 
@@ -543,15 +543,12 @@
             
             chatLoaded = true;
             console.log('✅ Datos cargados:', chatData.length, 'respuestas');
-            console.log('Preguntas disponibles:', chatData.map(d => d.pregunta));
-            
         } catch (error) {
             console.error('❌ Error cargando datos:', error);
             chatLoaded = false;
         }
     }
     
-    // Cargar datos al inicio
     loadChatData();
     
     function toggleChat() {
@@ -573,20 +570,59 @@
         
         if (!message) return;
         
-        // Agregar mensaje del usuario
         addMessage(message, 'user');
         input.value = '';
         
-        // Mostrar "escribiendo..."
+        // Procesar según el estado de la conversación
+        if (conversationState === 'collecting_name') {
+            userData.nombre = message;
+            conversationState = 'collecting_phone';
+            setTimeout(() => {
+                addMessage('Perfecto, ' + userData.nombre + '. ¿Cuál es tu número de teléfono? 📱', 'bot');
+            }, 500);
+            return;
+        }
+        
+        if (conversationState === 'collecting_phone') {
+            userData.telefono = message;
+            conversationState = 'collecting_email';
+            setTimeout(() => {
+                addMessage('Excelente. ¿Me podrías dar tu email? 📧', 'bot');
+            }, 500);
+            return;
+        }
+        
+        if (conversationState === 'collecting_email') {
+            userData.email = message;
+            conversationState = 'collecting_query';
+            setTimeout(() => {
+                addMessage('¿Qué tipo de tratamiento o consulta te interesa? 🦷', 'bot');
+            }, 500);
+            return;
+        }
+        
+        if (conversationState === 'collecting_query') {
+            userData.consulta = message;
+            conversationState = 'normal';
+            saveUserData();
+            return;
+        }
+        
+        // Conversación normal
         const typingId = addMessage('Escribiendo...', 'bot');
         
-        // Buscar respuesta
         setTimeout(() => {
-            // Remover "escribiendo..."
             document.getElementById(typingId).remove();
-            
             const response = findAnswer(message);
             addMessage(response, 'bot');
+            
+            // Después de 2 mensajes, ofrecer agendar cita
+            const userMessages = document.querySelectorAll('.user-message');
+            if (userMessages.length >= 2 && conversationState === 'normal') {
+                setTimeout(() => {
+                    addMessage('Por cierto, ¿te gustaría que agendemos una cita para ti? 📅 Solo necesito algunos datos. Responde "sí" para continuar.', 'bot');
+                }, 2000);
+            }
         }, 500);
     }
     
@@ -597,25 +633,23 @@
         
         const messageLower = userMessage.toLowerCase().trim();
         
-        // Buscar coincidencia exacta primero
+        // Detectar intención de agendar cita
+        const agendarKeywords = ['agendar', 'cita', 'reservar', 'turno', 'hora', 'si', 'sí', 'claro', 'ok', 'dale'];
+        if (agendarKeywords.some(keyword => messageLower.includes(keyword)) && conversationState === 'normal') {
+            conversationState = 'collecting_name';
+            return '¡Perfecto! 😊 Voy a ayudarte a agendar tu cita. Primero, ¿cómo te llamas?';
+        }
+        
+        // Buscar respuesta en el Sheet
         for (let item of chatData) {
-            if (messageLower === item.pregunta) {
+            if (messageLower === item.pregunta || messageLower.includes(item.pregunta) || item.pregunta.includes(messageLower)) {
                 return item.respuesta;
             }
         }
         
-        // Buscar coincidencia parcial
-        for (let item of chatData) {
-            if (messageLower.includes(item.pregunta) || item.pregunta.includes(messageLower)) {
-                return item.respuesta;
-            }
-        }
-        
-        // Buscar por palabras clave individuales
         const palabras = messageLower.split(' ');
         for (let palabra of palabras) {
-            if (palabra.length < 3) continue; // Ignorar palabras muy cortas
-            
+            if (palabra.length < 3) continue;
             for (let item of chatData) {
                 if (item.pregunta.includes(palabra)) {
                     return item.respuesta;
@@ -623,8 +657,33 @@
             }
         }
         
-        // Si no encuentra respuesta
-        return 'Lo siento, no tengo información sobre eso. 😅 Por favor contacta directamente al consultorio al +51 999 999 999 o agenda tu cita arriba. ☝️';
+        return 'Lo siento, no tengo información sobre eso. 😅 ¿Te gustaría agendar una cita para que te atendamos personalmente? Responde "sí" para continuar.';
+    }
+    
+    async function saveUserData() {
+        addMessage('Guardando tus datos...', 'bot');
+        
+        try {
+            const response = await fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(userData)
+            });
+            
+            setTimeout(() => {
+                addMessage('¡Listo! 🎉 Hemos guardado tus datos. Te contactaremos pronto al ' + userData.telefono + ' para confirmar tu cita. ¿Hay algo más en lo que pueda ayudarte?', 'bot');
+            }, 1000);
+            
+            // Reiniciar datos
+            userData = { nombre: '', telefono: '', email: '', consulta: '' };
+            
+        } catch (error) {
+            console.error('Error guardando datos:', error);
+            addMessage('Hubo un problema guardando tus datos. Por favor llámanos al +51 999 999 999 📞', 'bot');
+        }
     }
     
     function addMessage(text, sender) {
@@ -656,8 +715,6 @@
         bubble.textContent = text;
         messageDiv.appendChild(bubble);
         messagesDiv.appendChild(messageDiv);
-        
-        // Scroll al final
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
         
         return msgId;
@@ -665,7 +722,6 @@
 </script>
 
 <style>
-    /* Scroll personalizado para el chat */
     #chatMessages::-webkit-scrollbar {
         width: 6px;
     }
@@ -694,6 +750,7 @@
 </body>
 
 </html>
+
 
 
 
