@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. Carlos Mendoza - Odontología Integral</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #0077b6 0%, #023e8a 100%);
+            color: white;
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            margin-left: 2rem;
+            transition: all 0.3s;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .nav-links a.active {
+            background: rgba(255,255,255,0.3);
+            font-weight: bold;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #0077b6 0%, #023e8a 100%);
+            color: white;
+            padding: 120px 2rem 80px;
+            text-align: center;
+            margin-top: 60px;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+            animation: fadeInUp 0.8s ease 0.2s both;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: white;
+            color: #0077b6;
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+            animation: fadeInUp 0.8s ease 0.4s both;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        /* Sections */
+        section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            color: #023e8a;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 3rem;
+            font-size: 1.1rem;
+        }
+
+        /* Services */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .service-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-align: center;
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .service-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .service-card h3 {
+            color: #0077b6;
+            margin-bottom: 1rem;
+        }
+
+        /* Why Choose Us */
+        .benefits {
+            background: #f8f9fa;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .benefit-item {
+            display: flex;
+            align-items: start;
+            gap: 1rem;
+        }
+
+        .benefit-icon {
+            font-size: 2rem;
+            color: #0077b6;
+            flex-shrink: 0;
+        }
+
+        /* Calendar Section */
+        .calendar-section {
+            background: white;
+        }
+
+        .calendar-container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: #f8f9fa;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .calendar-placeholder {
+            background: white;
+            padding: 3rem;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px dashed #ccc;
+        }
+
+        .calendar-placeholder p {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .calendar-placeholder code {
+            background: #e9ecef;
+            padding: 0.3rem 0.6rem;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+
+        /* Contact Section */
+        .contact {
+            background: #023e8a;
+            color: white;
+        }
+
+        .contact h2 {
+            color: white;
+        }
+
+        .contact-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .contact-item {
+            text-align: center;
+            padding: 1.5rem;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            transition: background 0.3s;
+        }
+
+        .contact-item:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        .contact-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .contact-item a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        /* Footer */
+        footer {
+            background: #001d3d;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            h2 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav>
+            <div class="logo">🦷 Dr. Carlos Mendoza</div>
+            <div class="nav-links">
+                <a href="#servicios">Servicios</a>
+                <a href="#beneficios">Por qué elegirnos</a>
+                <a href="#citas">Agendar Cita</a>
+                <a href="#contacto">Contacto</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>Tu Sonrisa, Nuestra Prioridad</h1>
+        <p>Odontología integral con tecnología de punta en Lima, Perú</p>
+        <a href="#citas" class="cta-button">Agenda tu Cita Ahora</a>
+    </section>
+
+    <!-- Services Section -->
+    <section id="servicios">
+        <h2>Nuestros Servicios</h2>
+        <p class="section-subtitle">Tratamientos especializados para toda la familia</p>
+        
+        <div class="services-grid">
+            <div class="service-card">
+                <div class="service-icon">🦷</div>
+                <h3>Odontología General</h3>
+                <p>Limpieza dental, caries, endodoncia y tratamientos preventivos para mantener tu salud bucal.</p>
+            </div>
+            
+            <div class="service-card">
+                <div class="service-icon">✨</div>
+                <h3>Estética Dental</h3>
+                <p>Blanqueamiento, carillas y diseño de sonrisa para lucir tus dientes perfectos.</p>
+            </div>
+            
+            <div class="service-card">
+                <div class="service-icon">🔧</div>
+                <h3>Ortodoncia</h3>
+                <p>Brackets tradicionales e invisibles para alinear tu sonrisa de forma efectiva.</p>
+            </div>
+            
+            <div class="service-card">
+                <div class="service-icon">💎</div>
+                <h3>Implantes Dentales</h3>
+                <p>Reemplazo de piezas dentales con implantes de última generación y garantía.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section id="beneficios" class="benefits">
+        <h2>¿Por Qué Elegirnos?</h2>
+        <p class="section-subtitle">Comprometidos con tu bienestar y satisfacción</p>
+        
+        <div class="benefits-grid">
+            <div class="benefit-item">
+                <div class="benefit-icon">👨‍⚕️</div>
+                <div>
+                    <h3>15 Años de Experiencia</h3>
+                    <p>Especialista certificado con amplia trayectoria atendiendo a familias peruanas.</p>
+                </div>
+            </div>
+            
+            <div class="benefit-item">
+                <div class="benefit-icon">🏥</div>
+                <div>
+                    <h3>Equipamiento Moderno</h3>
+                    <p>Tecnología de punta para diagnósticos precisos y tratamientos cómodos.</p>
+                </div>
+            </div>
+            
+            <div class="benefit-item">
+                <div class="benefit-icon">💰</div>
+                <div>
+                    <h3>Planes de Pago Flexibles</h3>
+                    <p>Facilidades de pago y aceptamos principales seguros médicos.</p>
+                </div>
+            </div>
+            
+            <div class="benefit-item">
+                <div class="benefit-icon">⭐</div>
+                <div>
+                    <h3>Atención Personalizada</h3>
+                    <p>Cada paciente es único. Tratamientos adaptados a tus necesidades.</p>
+                </div>
+            </div>
+            
+            <div class="benefit-item">
+                <div class="benefit-icon">📍</div>
+                <div>
+                    <h3>Ubicación Céntrica</h3>
+                    <p>Consultorio en San Isidro, fácil acceso y estacionamiento disponible.</p>
+                </div>
+            </div>
+            
+            <div class="benefit-item">
+                <div class="benefit-icon">🕐</div>
+                <div>
+                    <h3>Horarios Flexibles</h3>
+                    <p>Atención de lunes a sábado, incluyendo horarios de tarde para tu comodidad.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Calendar Section -->
+    <section id="citas" class="calendar-section">
+        <h2>Agenda tu Cita</h2>
+        <p class="section-subtitle">Selecciona el día y hora que mejor te convenga</p>
+        
+        <div class="calendar-container">
+            <div class="calendar-placeholder">
+                <p><strong>📅 Aquí irá tu Google Calendar</strong></p>
+                <p>Para insertar tu calendario:</p>
+                <ol style="text-align: left; max-width: 600px; margin: 1rem auto;">
+                    <li>Ve a Google Calendar en tu computadora</li>
+                    <li>Click en ⚙️ Configuración > Configuración de "Mi calendario"</li>
+                    <li>Selecciona el calendario que quieres compartir</li>
+                    <li>En "Permisos de acceso" marca "Hacer disponible públicamente"</li>
+                    <li>Ve a "Integrar calendario" y copia el código <code>&lt;iframe&gt;</code></li>
+                    <li>Reemplaza este div con ese código</li>
+                </ol>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contacto" class="contact">
+        <h2>Contáctanos</h2>
+        <p class="section-subtitle">Estamos aquí para atenderte</p>
+        
+        <div class="contact-info">
+            <div class="contact-item">
+                <div class="contact-icon">📱</div>
+                <h3>WhatsApp</h3>
+                <a href="https://wa.me/51999999999" target="_blank">+51 999 999 999</a>
+            </div>
+            
+            <div class="contact-item">
+                <div class="contact-icon">📧</div>
+                <h3>Email</h3>
+                <a href="mailto:consultas@drmendoza.com">consultas@drmendoza.com</a>
+            </div>
+            
+            <div class="contact-item">
+                <div class="contact-icon">📍</div>
+                <h3>Dirección</h3>
+                <p>Av. Javier Prado Este 123<br>San Isidro, Lima</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 Dr. Carlos Mendoza - Odontología Integral. Todos los derechos reservados.</p>
+        <p style="margin-top: 0.5rem; opacity: 0.8;">Lima, Perú</p>
+    </footer>
+
+    <script>
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
