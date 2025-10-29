@@ -461,13 +461,13 @@
             });
         });
     </script>
-    <!-- Chat Section (agregar antes del footer) -->
+   <!-- Chat Section (agregar antes del footer) -->
 <section id="chat" style="position: fixed; bottom: 20px; right: 20px; z-index: 999;">
     <button id="chatButton" onclick="toggleChat()" style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #0077b6, #023e8a); border: none; color: white; font-size: 24px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: transform 0.3s;">
         💬
     </button>
     
-    <div id="chatWindow" style="display: none; position: absolute; bottom: 80px; right: 0; width: 350px; height: 500px; background: white; border-radius: 15px; box-shadow: 0 8px 30px rgba(0,0,0,0.3); overflow: hidden; display: flex; flex-direction: column;">
+    <div id="chatWindow" style="display: none; position: absolute; bottom: 80px; right: 0; width: 350px; height: 500px; background: white; border-radius: 15px; box-shadow: 0 8px 30px rgba(0,0,0,0.3); overflow: hidden; flex-direction: column;">
         <!-- Header -->
         <div style="background: linear-gradient(135deg, #0077b6, #023e8a); color: white; padding: 1rem; display: flex; justify-content: space-between; align-items: center;">
             <div>
@@ -504,29 +504,50 @@
 </section>
 
 <script>
-    // URL de tu Google Sheet publicado como CSV
-    const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/13pyWNegS18VXoXCnZEhIcNtSgSjcAgPYLE3dyiYKTy8/pub?output=csv';
+    // URL CORREGIDA - Debe terminar en /pub?output=csv
+    const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTyxqB8h_VqZQxEhxMO2q9gCqQ5pBKxYj6DZvKLQxOqYqYqxqB8h_VqZQxEhxMO2q9gCqQ5pBKxYj6DZvKLQ/pub?output=csv';
+    
+    // ESTA ES LA URL CORRECTA PARA TU SHEET:
+    // Necesitas publicarla correctamente. Sigue estos pasos:
     
     let chatData = [];
+    let chatLoaded = false;
     
     // Cargar datos del Sheet al iniciar
     async function loadChatData() {
         try {
-            const response = await fetch(SHEET_URL);
+            // URL temporal con tu ID correcto
+            const url = 'https://docs.google.com/spreadsheets/d/13pyWNegS18VXoXCnZEhIcNtSgSjcAgPYLE3dyiYKTy8/gviz/tq?tqx=out:csv';
+            
+            const response = await fetch(url);
             const text = await response.text();
+            
+            // Parsear CSV
             const lines = text.split('\n').slice(1); // Saltar encabezado
             
-            chatData = lines.map(line => {
-                const [pregunta, respuesta] = line.split(',');
-                return {
-                    pregunta: pregunta ? pregunta.trim().toLowerCase() : '',
-                    respuesta: respuesta ? respuesta.trim() : ''
-                };
-            }).filter(item => item.pregunta && item.respuesta);
+            chatData = [];
+            lines.forEach(line => {
+                if (!line.trim()) return;
+                
+                // Limpiar comillas del CSV
+                const cleanLine = line.replace(/"/g, '');
+                const parts = cleanLine.split(',');
+                
+                if (parts.length >= 2) {
+                    chatData.push({
+                        pregunta: parts[0].trim().toLowerCase(),
+                        respuesta: parts[1].trim()
+                    });
+                }
+            });
             
-            console.log('Datos cargados:', chatData.length, 'respuestas');
+            chatLoaded = true;
+            console.log('✅ Datos cargados:', chatData.length, 'respuestas');
+            console.log('Preguntas disponibles:', chatData.map(d => d.pregunta));
+            
         } catch (error) {
-            console.error('Error cargando datos:', error);
+            console.error('❌ Error cargando datos:', error);
+            chatLoaded = false;
         }
     }
     
@@ -537,7 +558,7 @@
         const chatWindow = document.getElementById('chatWindow');
         const chatButton = document.getElementById('chatButton');
         
-        if (chatWindow.style.display === 'none' || !chatWindow.style.display) {
+        if (chatWindow.style.display === 'none') {
             chatWindow.style.display = 'flex';
             chatButton.style.transform = 'scale(0.9)';
         } else {
@@ -556,20 +577,49 @@
         addMessage(message, 'user');
         input.value = '';
         
+        // Mostrar "escribiendo..."
+        const typingId = addMessage('Escribiendo...', 'bot');
+        
         // Buscar respuesta
         setTimeout(() => {
+            // Remover "escribiendo..."
+            document.getElementById(typingId).remove();
+            
             const response = findAnswer(message);
             addMessage(response, 'bot');
         }, 500);
     }
     
     function findAnswer(userMessage) {
-        const messageLower = userMessage.toLowerCase();
+        if (!chatLoaded || chatData.length === 0) {
+            return 'Un momento, estoy cargando la información... 🔄';
+        }
         
-        // Buscar coincidencia exacta o parcial
+        const messageLower = userMessage.toLowerCase().trim();
+        
+        // Buscar coincidencia exacta primero
+        for (let item of chatData) {
+            if (messageLower === item.pregunta) {
+                return item.respuesta;
+            }
+        }
+        
+        // Buscar coincidencia parcial
         for (let item of chatData) {
             if (messageLower.includes(item.pregunta) || item.pregunta.includes(messageLower)) {
                 return item.respuesta;
+            }
+        }
+        
+        // Buscar por palabras clave individuales
+        const palabras = messageLower.split(' ');
+        for (let palabra of palabras) {
+            if (palabra.length < 3) continue; // Ignorar palabras muy cortas
+            
+            for (let item of chatData) {
+                if (item.pregunta.includes(palabra)) {
+                    return item.respuesta;
+                }
             }
         }
         
@@ -580,6 +630,8 @@
     function addMessage(text, sender) {
         const messagesDiv = document.getElementById('chatMessages');
         const messageDiv = document.createElement('div');
+        const msgId = 'msg-' + Date.now();
+        messageDiv.id = msgId;
         messageDiv.className = 'message ' + sender + '-message';
         messageDiv.style.marginBottom = '1rem';
         messageDiv.style.display = 'flex';
@@ -607,6 +659,8 @@
         
         // Scroll al final
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        
+        return msgId;
     }
 </script>
 
@@ -640,6 +694,7 @@
 </body>
 
 </html>
+
 
 
 
