@@ -414,31 +414,41 @@
     </div>
 </section>
 
-    <!-- Contact Section -->
-    <section id="contacto" class="contact">
-        <h2>Contáctanos</h2>
-        <p class="section-subtitle">Estamos aquí para atenderte</p>
-        
-        <div class="contact-info">
-            <div class="contact-item">
-                <div class="contact-icon">📱</div>
-                <h3>WhatsApp</h3>
-                <a href="https://wa.me/51999999999" target="_blank">+51 999 999 999</a>
-            </div>
-            
-            <div class="contact-item">
-                <div class="contact-icon">📧</div>
-                <h3>Email</h3>
-                <a href="mailto:consultas@drmendoza.com">consultas@drmendoza.com</a>
-            </div>
-            
-            <div class="contact-item">
-                <div class="contact-icon">📍</div>
-                <h3>Dirección</h3>
-                <p>Av. Javier Prado Este 123<br>San Isidro, Lima</p>
-            </div>
+   <!-- Contact Section -->
+<section id="contacto" class="contact">
+    <h2>Contáctanos</h2>
+    <p class="section-subtitle">Estamos aquí para atenderte</p>
+    
+    <div class="contact-info">
+        <div class="contact-item">
+            <div class="contact-icon">📱</div>
+            <h3>WhatsApp</h3>
+            <a href="https://wa.me/51999999999?text=Hola%2C%20estoy%20interesado%20en%20consultar%20sus%20servicios" target="_blank">+51 999 999 999</a>
+            <p style="margin-top: 0.5rem; font-size: 0.9rem;">Click para chatear directamente</p>
         </div>
-    </section>
+        
+        <div class="contact-item">
+            <div class="contact-icon">📧</div>
+            <h3>Email</h3>
+            <a href="mailto:consultas@drmendoza.com">consultas@drmendoza.com</a>
+        </div>
+        
+        <div class="contact-item">
+            <div class="contact-icon">📍</div>
+            <h3>Dirección</h3>
+            <p>Av. Javier Prado Este 123<br>San Isidro, Lima</p>
+        </div>
+    </div>
+    
+    <!-- Botón flotante de WhatsApp -->
+    <a href="https://wa.me/51999999999?text=Hola%2C%20estoy%20interesado%20en%20consultar%20sus%20servicios" 
+       target="_blank"
+       style="position: fixed; bottom: 90px; right: 20px; width: 60px; height: 60px; background: #25D366; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 998; transition: transform 0.3s; text-decoration: none; font-size: 30px;"
+       onmouseover="this.style.transform='scale(1.1)'"
+       onmouseout="this.style.transform='scale(1)'">
+        <span style="color: white;">💬</span>
+    </a>
+</section>
 
     <!-- Footer -->
     <footer>
@@ -511,7 +521,7 @@
     
     let chatData = [];
     let chatLoaded = false;
-    let conversationState = 'normal'; // normal, collecting_name, collecting_phone, collecting_email, collecting_query
+    let conversationState = 'normal';
     let userData = {
         nombre: '',
         telefono: '',
@@ -564,6 +574,56 @@
         }
     }
     
+    // VALIDACIONES
+    function validarNombre(nombre) {
+        if (nombre.length < 2) {
+            return { valido: false, mensaje: 'El nombre debe tener al menos 2 caracteres.' };
+        }
+        if (!/^[a-záéíóúñA-ZÁÉÍÓÚÑ\s]+$/.test(nombre)) {
+            return { valido: false, mensaje: 'El nombre solo puede contener letras.' };
+        }
+        return { valido: true };
+    }
+    
+    function validarTelefono(telefono) {
+        // Limpiar el teléfono de espacios y caracteres especiales
+        const telefonoLimpio = telefono.replace(/[\s\-\(\)]/g, '');
+        
+        // Validar formato peruano: debe tener 9 dígitos o +51 seguido de 9 dígitos
+        const regexPeru = /^(\+51|51)?9\d{8}$/;
+        
+        if (!regexPeru.test(telefonoLimpio)) {
+            return { 
+                valido: false, 
+                mensaje: 'Por favor ingresa un número válido de Perú (9 dígitos, comenzando con 9). Ejemplo: 987654321' 
+            };
+        }
+        
+        return { valido: true, telefonoLimpio: telefonoLimpio };
+    }
+    
+    function validarEmail(email) {
+        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        
+        if (!regex.test(email)) {
+            return { 
+                valido: false, 
+                mensaje: 'Por favor ingresa un email válido. Ejemplo: nombre@ejemplo.com' 
+            };
+        }
+        
+        // Validaciones adicionales
+        if (email.length < 5) {
+            return { valido: false, mensaje: 'El email es demasiado corto.' };
+        }
+        
+        if (email.length > 100) {
+            return { valido: false, mensaje: 'El email es demasiado largo.' };
+        }
+        
+        return { valido: true };
+    }
+    
     function sendMessage() {
         const input = document.getElementById('chatInput');
         const message = input.value.trim();
@@ -573,35 +633,72 @@
         addMessage(message, 'user');
         input.value = '';
         
-        // Procesar según el estado de la conversación
+        // VALIDAR NOMBRE
         if (conversationState === 'collecting_name') {
+            const validacion = validarNombre(message);
+            
+            if (!validacion.valido) {
+                setTimeout(() => {
+                    addMessage('❌ ' + validacion.mensaje + ' Por favor intenta de nuevo.', 'bot');
+                }, 500);
+                return;
+            }
+            
             userData.nombre = message;
             conversationState = 'collecting_phone';
             setTimeout(() => {
-                addMessage('Perfecto, ' + userData.nombre + '. ¿Cuál es tu número de teléfono? 📱', 'bot');
+                addMessage('Perfecto, ' + userData.nombre + '. ¿Cuál es tu número de teléfono? 📱\n\n(Ejemplo: 987654321)', 'bot');
             }, 500);
             return;
         }
         
+        // VALIDAR TELÉFONO
         if (conversationState === 'collecting_phone') {
-            userData.telefono = message;
+            const validacion = validarTelefono(message);
+            
+            if (!validacion.valido) {
+                setTimeout(() => {
+                    addMessage('❌ ' + validacion.mensaje, 'bot');
+                }, 500);
+                return;
+            }
+            
+            userData.telefono = validacion.telefonoLimpio;
             conversationState = 'collecting_email';
             setTimeout(() => {
-                addMessage('Excelente. ¿Me podrías dar tu email? 📧', 'bot');
+                addMessage('Excelente. ¿Me podrías dar tu email? 📧\n\n(Ejemplo: nombre@ejemplo.com)', 'bot');
             }, 500);
             return;
         }
         
+        // VALIDAR EMAIL
         if (conversationState === 'collecting_email') {
+            const validacion = validarEmail(message);
+            
+            if (!validacion.valido) {
+                setTimeout(() => {
+                    addMessage('❌ ' + validacion.mensaje, 'bot');
+                }, 500);
+                return;
+            }
+            
             userData.email = message;
             conversationState = 'collecting_query';
             setTimeout(() => {
-                addMessage('¿Qué tipo de tratamiento o consulta te interesa? 🦷', 'bot');
+                addMessage('¿Qué tipo de tratamiento o consulta te interesa? 🦷\n\n(Por ejemplo: Limpieza dental, Ortodoncia, Blanqueamiento, etc.)', 'bot');
             }, 500);
             return;
         }
         
+        // VALIDAR CONSULTA
         if (conversationState === 'collecting_query') {
+            if (message.length < 5) {
+                setTimeout(() => {
+                    addMessage('❌ Por favor describe un poco más tu consulta (mínimo 5 caracteres).', 'bot');
+                }, 500);
+                return;
+            }
+            
             userData.consulta = message;
             conversationState = 'normal';
             saveUserData();
@@ -634,7 +731,7 @@
         const messageLower = userMessage.toLowerCase().trim();
         
         // Detectar intención de agendar cita
-        const agendarKeywords = ['agendar', 'cita', 'reservar', 'turno', 'hora', 'si', 'sí', 'claro', 'ok', 'dale'];
+        const agendarKeywords = ['agendar', 'cita', 'reservar', 'turno', 'hora', 'si', 'sí', 'claro', 'ok', 'dale', 'quiero'];
         if (agendarKeywords.some(keyword => messageLower.includes(keyword)) && conversationState === 'normal') {
             conversationState = 'collecting_name';
             return '¡Perfecto! 😊 Voy a ayudarte a agendar tu cita. Primero, ¿cómo te llamas?';
@@ -702,6 +799,7 @@
         bubble.style.maxWidth = '85%';
         bubble.style.fontSize = '0.9rem';
         bubble.style.lineHeight = '1.4';
+        bubble.style.whiteSpace = 'pre-line'; // Para respetar saltos de línea
         
         if (sender === 'user') {
             bubble.style.background = 'linear-gradient(135deg, #0077b6, #023e8a)';
@@ -720,36 +818,10 @@
         return msgId;
     }
 </script>
-
-<style>
-    #chatMessages::-webkit-scrollbar {
-        width: 6px;
-    }
-    
-    #chatMessages::-webkit-scrollbar-track {
-        background: #f1f1f1;
-    }
-    
-    #chatMessages::-webkit-scrollbar-thumb {
-        background: #0077b6;
-        border-radius: 3px;
-    }
-    
-    #chatButton:hover {
-        transform: scale(1.1) !important;
-    }
-    
-    @media (max-width: 768px) {
-        #chatWindow {
-            width: calc(100vw - 40px) !important;
-            right: 20px !important;
-            left: 20px !important;
-        }
-    }
-</style>
 </body>
     
 </html>
+
 
 
 
