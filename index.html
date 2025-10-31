@@ -482,8 +482,8 @@
 <!-- Botón de WhatsApp -->
 <a href="https://wa.me/51999999999?text=Hola%2C%20estoy%20interesado%20en%20consultar%20sus%20servicios" 
    target="_blank"
-   onclick="console.log('WhatsApp clicked!'); return true;"
-   style="position: fixed !important; bottom: 150px !important; right: 30px !important; width: 60px !important; height: 60px !important; background: #25D366 !important; border-radius: 50% !important; display: block !important; z-index: 10000 !important; cursor: pointer !important; box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important; text-decoration: none !important;">
+   id="whatsappFloatBtn"
+   style="position: fixed !important; bottom: 150px !important; right: 30px !important; width: 60px !important; height: 60px !important; background: #25D366 !important; border-radius: 50% !important; display: block !important; z-index: 10000 !important; cursor: pointer !important; box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important; text-decoration: none !important; transition: all 0.3s !important;">
     <span style="position: absolute; top: 15px; left: 15px; font-size: 30px; pointer-events: none; color: white;">💬</span>
 </a>
 
@@ -709,16 +709,28 @@
 function toggleChat() {
     const chatWindow = document.getElementById('chatWindow');
     const chatButton = document.getElementById('chatButton');
-    const whatsappBtn = document.querySelector('a[href*="wa.me"]');
+    const whatsappBtn = document.getElementById('whatsappFloatBtn');
     
-    if (chatWindow.style.display === 'none') {
+    if (chatWindow.style.display === 'none' || !chatWindow.style.display) {
+        // Abrir chat
         chatWindow.style.display = 'flex';
         chatButton.style.transform = 'scale(0.9)';
-        if (whatsappBtn) whatsappBtn.style.display = 'none'; // Ocultar WhatsApp cuando se abre chat
+        
+        // Ocultar WhatsApp
+        if (whatsappBtn) {
+            whatsappBtn.style.opacity = '0';
+            whatsappBtn.style.pointerEvents = 'none';
+        }
     } else {
+        // Cerrar chat
         chatWindow.style.display = 'none';
         chatButton.style.transform = 'scale(1)';
-        if (whatsappBtn) whatsappBtn.style.display = 'block'; // Mostrar WhatsApp cuando se cierra chat
+        
+        // Mostrar WhatsApp
+        if (whatsappBtn) {
+            whatsappBtn.style.opacity = '1';
+            whatsappBtn.style.pointerEvents = 'auto';
+        }
     }
 }
     
@@ -969,6 +981,7 @@ function toggleChat() {
 </body>
     
 </html>
+
 
 
 
