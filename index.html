@@ -482,7 +482,9 @@
     <!-- Botón flotante de WhatsApp - REEMPLAZA TODO -->
 <a href="https://wa.me/51999999999?text=Hola%2C%20estoy%20interesado%20en%20consultar%20sus%20servicios" 
    target="_blank"
-   class="whatsapp-float">
+   onclick="console.log('WhatsApp clicked!'); return true;"
+   style="position: fixed !important; bottom: 160px !important; right: 20px !important; width: 60px !important; height: 60px !important; background: #25D366 !important; border-radius: 50% !important; display: block !important; z-index: 9999 !important; cursor: pointer !important; box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important; text-decoration: none !important;">
+    <span style="position: absolute; top: 15px; left: 15px; font-size: 30px; pointer-events: none;">💬</span>
 </a>
 
 <style>
@@ -1005,6 +1007,7 @@
 </body>
     
 </html>
+
 
 
 
