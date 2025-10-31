@@ -706,18 +706,21 @@
     
     loadChatData();
     
-    function toggleChat() {
-        const chatWindow = document.getElementById('chatWindow');
-        const chatButton = document.getElementById('chatButton');
-        
-        if (chatWindow.style.display === 'none') {
-            chatWindow.style.display = 'flex';
-            chatButton.style.transform = 'scale(0.9)';
-        } else {
-            chatWindow.style.display = 'none';
-            chatButton.style.transform = 'scale(1)';
-        }
+function toggleChat() {
+    const chatWindow = document.getElementById('chatWindow');
+    const chatButton = document.getElementById('chatButton');
+    const whatsappBtn = document.querySelector('a[href*="wa.me"]');
+    
+    if (chatWindow.style.display === 'none') {
+        chatWindow.style.display = 'flex';
+        chatButton.style.transform = 'scale(0.9)';
+        if (whatsappBtn) whatsappBtn.style.display = 'none'; // Ocultar WhatsApp cuando se abre chat
+    } else {
+        chatWindow.style.display = 'none';
+        chatButton.style.transform = 'scale(1)';
+        if (whatsappBtn) whatsappBtn.style.display = 'block'; // Mostrar WhatsApp cuando se cierra chat
     }
+}
     
     // VALIDACIONES
     function validarNombre(nombre) {
@@ -966,6 +969,7 @@
 </body>
     
 </html>
+
 
 
 
