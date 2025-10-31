@@ -433,10 +433,47 @@
             <a href="mailto:consultas@drmendoza.com">consultas@drmendoza.com</a>
         </div>
         
-        <div class="contact-item">
+        <div class="contact-item" style="cursor: pointer;" onclick="abrirMapa()">
             <div class="contact-icon">📍</div>
-            <h3>Dirección</h3>
-            <p>Av. Javier Prado Este 123<br>San Isidro, Lima</p>
+            <h3 style="color: #00d9ff; text-decoration: underline;">Dirección</h3>
+            <p style="transition: color 0.3s;">Av. Javier Prado Este 123<br>San Isidro, Lima</p>
+            <p style="margin-top: 0.5rem; font-size: 0.9rem; color: #00d9ff;">Click para ver en el mapa</p>
+        </div>
+    </div>
+    
+    <!-- Modal del Mapa -->
+    <div id="mapaModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; justify-content: center; align-items: center;">
+        <div style="position: relative; width: 90%; max-width: 900px; height: 80%; background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 50px rgba(0,0,0,0.5);">
+            <!-- Botón cerrar -->
+            <button onclick="cerrarMapa()" style="position: absolute; top: 15px; right: 15px; z-index: 10000; background: white; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 24px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); transition: all 0.3s;">
+                ✕
+            </button>
+            
+            <!-- Header del modal -->
+            <div style="background: linear-gradient(135deg, #0077b6, #023e8a); color: white; padding: 1.5rem; text-align: center;">
+                <h3 style="margin: 0; font-size: 1.5rem;">📍 Nuestra Ubicación</h3>
+                <p style="margin: 0.5rem 0 0 0; font-size: 1rem; opacity: 0.9;">Av. Javier Prado Este 123, San Isidro, Lima</p>
+            </div>
+            
+            <!-- Mapa -->
+            <iframe id="mapaFrame"
+                    width="100%" 
+                    height="calc(100% - 100px)" 
+                    style="border:0;" 
+                    allowfullscreen="" 
+                    loading="lazy" 
+                    referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+            
+            <!-- Botones de acción -->
+            <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 1rem; z-index: 10000;">
+                <a href="#" id="comoLlegarBtn" target="_blank" style="background: #4285F4; color: white; padding: 0.8rem 1.5rem; border-radius: 25px; text-decoration: none; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: transform 0.3s;">
+                    🚗 Cómo llegar
+                </a>
+                <button onclick="cerrarMapa()" style="background: white; color: #333; padding: 0.8rem 1.5rem; border-radius: 25px; border: 2px solid #ddd; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: transform 0.3s;">
+                    Cerrar
+                </button>
+            </div>
         </div>
     </div>
     
@@ -449,6 +486,98 @@
         <span style="color: white;">💬</span>
     </a>
 </section>
+
+<script>
+    // CONFIGURA TU DIRECCIÓN AQUÍ
+    const DIRECCION_COMPLETA = "Av. Javier Prado Este 123, San Isidro, Lima, Perú";
+    
+    // Opción 1: Si tienes las coordenadas exactas (más preciso)
+    const LATITUD = -12.0935337;  // Reemplaza con tu latitud
+    const LONGITUD = -77.0282391; // Reemplaza con tu longitud
+    
+    function abrirMapa() {
+        const modal = document.getElementById('mapaModal');
+        const iframe = document.getElementById('mapaFrame');
+        const comoLlegarBtn = document.getElementById('comoLlegarBtn');
+        
+        // Construir URL del mapa embebido
+        const mapaEmbedURL = `https://maps.google.com/maps?q=${LATITUD},${LONGITUD}&hl=es&z=17&output=embed`;
+        
+        // URL para "Cómo llegar" (abre Google Maps)
+        const comoLlegarURL = `https://www.google.com/maps/dir/?api=1&destination=${LATITUD},${LONGITUD}`;
+        
+        iframe.src = mapaEmbedURL;
+        comoLlegarBtn.href = comoLlegarURL;
+        
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden'; // Evitar scroll del body
+    }
+    
+    function cerrarMapa() {
+        const modal = document.getElementById('mapaModal');
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto'; // Restaurar scroll
+    }
+    
+    // Cerrar al presionar ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            cerrarMapa();
+        }
+    });
+    
+    // Cerrar al hacer click fuera del mapa
+    document.getElementById('mapaModal').addEventListener('click', function(e) {
+        if (e.target.id === 'mapaModal') {
+            cerrarMapa();
+        }
+    });
+</script>
+
+<style>
+    /* Animación de hover para la dirección */
+    .contact-item:hover h3 {
+        color: #00f0ff !important;
+    }
+    
+    .contact-item:hover p {
+        color: #00d9ff;
+    }
+    
+    /* Animación del modal */
+    #mapaModal > div {
+        animation: modalSlideIn 0.3s ease-out;
+    }
+    
+    @keyframes modalSlideIn {
+        from {
+            transform: scale(0.8);
+            opacity: 0;
+        }
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        #mapaModal > div {
+            width: 95% !important;
+            height: 85% !important;
+        }
+        
+        #mapaModal > div > div:last-child {
+            flex-direction: column;
+            width: 90% !important;
+        }
+        
+        #mapaModal > div > div:last-child a,
+        #mapaModal > div > div:last-child button {
+            width: 100%;
+        }
+    }
+</style>
 
     <!-- Footer -->
     <footer>
@@ -821,6 +950,7 @@
 </body>
     
 </html>
+
 
 
 
