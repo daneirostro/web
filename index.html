@@ -480,13 +480,36 @@
 </div>
     
     <!-- Botón flotante de WhatsApp -->
-    <a href="https://wa.me/51999999999?text=Hola%2C%20estoy%20interesado%20en%20consultar%20sus%20servicios" 
-       target="_blank"
-       style="position: fixed; bottom: 90px; right: 20px; width: 60px; height: 60px; background: #25D366; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 998; transition: transform 0.3s; text-decoration: none; font-size: 30px;"
-       onmouseover="this.style.transform='scale(1.1)'"
-       onmouseout="this.style.transform='scale(1)'">
-        <span style="color: white;">💬</span>
-    </a>
+   <a href="https://wa.me/51999999999?text=Hola%2C%20estoy%20interesado%20en%20consultar%20sus%20servicios" 
+   target="_blank"
+   id="whatsappButton"
+   style="position: fixed; bottom: 160px; right: 20px; width: 60px; height: 60px; background: #25D366; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 999; transition: transform 0.3s; text-decoration: none; font-size: 30px;">
+    <span style="color: white; pointer-events: none;">💬</span>
+</a>
+
+    <style>
+    #whatsappButton:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 20px rgba(37, 211, 102, 0.5);
+    }
+    
+    #whatsappButton:active {
+        transform: scale(0.95);
+    }
+    
+    /* Responsive: ajustar en móviles */
+    @media (max-width: 768px) {
+        #whatsappButton {
+            bottom: 20px !important;
+            left: 20px !important;
+        }
+        
+        #chat {
+            bottom: 90px !important;
+        }
+    }
+</style>
+    
 </section>
 
 <script>
@@ -959,6 +982,7 @@
 </body>
     
 </html>
+
 
 
 
