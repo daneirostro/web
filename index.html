@@ -479,29 +479,31 @@
     </div>
 </div>
     
-    <!-- Botón de WhatsApp perfectamente alineado -->
+    <!-- Botón de WhatsApp -->
 <a href="https://wa.me/51999999999?text=Hola%2C%20estoy%20interesado%20en%20consultar%20sus%20servicios" 
    target="_blank"
    id="whatsappBtn"
-   style="position: fixed !important; width: 60px !important; height: 60px !important; background: #25D366 !important; border-radius: 50% !important; display: flex !important; align-items: center !important; justify-content: center !important; z-index: 9999 !important; cursor: pointer !important; box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important; text-decoration: none !important; bottom: 100px; right: 20px;">
+   style="position: fixed !important; right: 20px !important; width: 60px !important; height: 60px !important; background: #25D366 !important; border-radius: 50% !important; display: flex !important; align-items: center !important; justify-content: center !important; z-index: 9999 !important; cursor: pointer !important; box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important; text-decoration: none !important; transition: transform 0.3s !important;">
     <span style="font-size: 30px; pointer-events: none; color: white;">💬</span>
 </a>
 
 <script>
-// Forzar alineación perfecta al cargar la página
 window.addEventListener('load', function() {
     var chatBtn = document.getElementById('chatButton');
     var whatsappBtn = document.getElementById('whatsappBtn');
     
     if (chatBtn && whatsappBtn) {
-        // Obtener la posición exacta del botón de chat
-        var chatRight = window.getComputedStyle(chatBtn.parentElement).right;
+        // Calcular posición automáticamente
+        var chatBottom = parseInt(window.getComputedStyle(chatBtn).bottom);
+        var chatHeight = chatBtn.offsetHeight;
+        var separacion = 10; // 10px de espacio entre botones
         
-        // Aplicar la misma posición al botón de WhatsApp
-        whatsappBtn.style.right = chatRight;
+        var whatsappBottom = chatBottom + chatHeight + separacion;
+        whatsappBtn.style.bottom = whatsappBottom + 'px';
         
-        console.log('Chat right:', chatRight);
-        console.log('WhatsApp alineado correctamente');
+        console.log('Chat bottom:', chatBottom);
+        console.log('Chat height:', chatHeight);
+        console.log('WhatsApp bottom calculado:', whatsappBottom);
     }
 });
 </script>
@@ -510,11 +512,6 @@ window.addEventListener('load', function() {
     #whatsappBtn:hover {
         transform: scale(1.1) !important;
         box-shadow: 0 6px 20px rgba(37, 211, 102, 0.5) !important;
-    }
-    
-    /* Ajustar separación entre botones */
-    #whatsappBtn {
-        bottom: 100px !important; /* 80px de separación desde el chat */
     }
 </style>
     
@@ -990,6 +987,7 @@ window.addEventListener('load', function() {
 </body>
     
 </html>
+
 
 
 
