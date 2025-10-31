@@ -468,14 +468,14 @@
         </div>
         
         <!-- Botones de acción -->
-        <div style="padding: 1rem; background: white; display: flex; gap: 1rem; justify-content: center; flex-shrink: 0; border-top: 1px solid #e0e0e0;">
-            <a id="comoLlegarBtn" href="#" target="_blank" style="background: #4285F4; color: white; padding: 0.8rem 1.5rem; border-radius: 25px; text-decoration: none; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: transform 0.3s;">
-                🚗 Cómo llegar
-            </a>
-            <button onclick="cerrarMapa()" style="background: white; color: #333; padding: 0.8rem 1.5rem; border-radius: 25px; border: 2px solid #ddd; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: transform 0.3s;">
-                Cerrar
-            </button>
-        </div>
+<div style="padding: 1rem; background: white; display: flex; gap: 1rem; justify-content: center; flex-shrink: 0; border-top: 1px solid #e0e0e0;">
+    <button onclick="abrirNavegacion()" style="background: #4285F4; color: white; padding: 0.8rem 1.5rem; border-radius: 25px; text-decoration: none; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: transform 0.3s; border: none; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;">
+        🚗 Cómo llegar
+    </button>
+    <button onclick="cerrarMapa()" style="background: white; color: #333; padding: 0.8rem 1.5rem; border-radius: 25px; border: 2px solid #ddd; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: transform 0.3s;">
+        Cerrar
+    </button>
+</div>
     </div>
 </div>
     
@@ -500,23 +500,26 @@
     function abrirMapa() {
         const modal = document.getElementById('mapaModal');
         const iframe = document.getElementById('mapaFrame');
-        const comoLlegarBtn = document.getElementById('comoLlegarBtn');
         
         // Construir URL del mapa embebido
         const mapaEmbedURL = `https://maps.google.com/maps?q=${LATITUD},${LONGITUD}&hl=es&z=17&output=embed`;
         
-        // URL para "Cómo llegar" (abre Google Maps con navegación)
-        const comoLlegarURL = `https://www.google.com/maps/dir/?api=1&destination=${LATITUD},${LONGITUD}`;
-        
-        // Asignar URLs
+        // Asignar URL al iframe
         iframe.src = mapaEmbedURL;
-        comoLlegarBtn.href = comoLlegarURL;
         
         // Mostrar modal
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
+    }
+    
+    function abrirNavegacion() {
+        // URL para "Cómo llegar" (abre Google Maps con navegación)
+        const comoLlegarURL = `https://www.google.com/maps/dir/?api=1&destination=${LATITUD},${LONGITUD}`;
         
-        console.log('Mapa abierto. URL de navegación:', comoLlegarURL);
+        console.log('Abriendo navegación:', comoLlegarURL);
+        
+        // Abrir en nueva pestaña
+        window.open(comoLlegarURL, '_blank');
     }
     
     function cerrarMapa() {
@@ -956,6 +959,7 @@
 </body>
     
 </html>
+
 
 
 
